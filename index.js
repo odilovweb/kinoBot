@@ -146,26 +146,38 @@ bot.command("kino_qosh", async (ctx) => {
 });
 
 bot.on("text", async (ctx) => {
-  textId = ctx.message.text;
-  console.log(Number(textId) !== NaN);
-  if (typeof Number(textId) == "number" && textId.length < 4) {
-    let kinoBormi = false;
-    kinolar.forEach(async (kino) => {
-      if (kino.id == textId) {
-        kinoBormi = true;
+  const azo = await isMemberFunc(ctx);
+  if (!azo) {
+    try {
+      ctx.reply(
+        "Iltimos botdan to'liq foydalanish uchun , quyidagi kanallarga a'zo bo'ishingizni so'raymiz",
+        { reply_markup: { inline_keyboard: majburiyKeyboard } }
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  } else {
+    textId = ctx.message.text;
+    console.log(Number(textId) !== NaN);
+    if (typeof Number(textId) == "number" && textId.length < 4) {
+      let kinoBormi = false;
+      kinolar.forEach(async (kino) => {
+        if (kino.id == textId) {
+          kinoBormi = true;
+          try {
+            await ctx.replyWithVideo(kino.link);
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      });
+      console.log(kinoBormi);
+      if (!kinoBormi) {
         try {
-          await ctx.replyWithVideo(kino.link);
+          await ctx.reply("Afsuski siz qidirgan kino topilmadi 😔");
         } catch (e) {
           console.log(e);
         }
-      }
-    });
-    console.log(kinoBormi);
-    if (!kinoBormi) {
-      try {
-        await ctx.reply("Afsuski siz qidirgan kino topilmadi 😔");
-      } catch (e) {
-        console.log(e);
       }
     }
   }
