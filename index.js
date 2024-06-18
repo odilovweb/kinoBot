@@ -2,6 +2,7 @@ const { default: axios, formToJSON } = require("axios");
 const { Telegraf } = require("telegraf");
 const { message } = require("telegraf/filters");
 const { link } = require("telegraf/format");
+const { inlineKeyboard } = require("telegraf/markup");
 const bot = new Telegraf("7316246406:AAHejBxzyGXueqVRl7Bnje5KSgaNfxBLgt0");
 
 const admin = "841886966";
@@ -68,6 +69,11 @@ const isMemberFunc = async (ctx) => {
     .then((s) => s.status)
     .catch((e) => console.log(e));
 
+  // const member2 = await ctx
+  //   .telegram(`-100${ikkiKanalId}`, id)
+  //   .then((s) => s.status)
+  //   .catch((e) => console.log(e));
+
   //   const member2 = await ctx.telegram
   //     .getChatMember(`-100${channel2}`, id)
   //     .then((s) => s.status)
@@ -92,6 +98,10 @@ const majburiyKeyboard = [
   [{ text: "Birinchi kanal 📢", url: birKanalLink }],
   [{ text: "Ikkinchi kanal 📢", url: ikkiKanalLink }],
   [{ text: "Tekshirish", callback_data: "check" }],
+];
+
+const kanalKeyboard = [
+  [{ text: "Barcha kinolar ushbu botda 🍿", url: "t.me/Kinolar_olami_rbot" }],
 ];
 
 bot.start(async (ctx) => {
@@ -144,8 +154,36 @@ bot.command("kino_qosh", async (ctx) => {
     addMovie();
   }
 });
-
-bot.on("text", async (ctx) => {
+bot.on("chat_join_request", (ctx) => {
+  try {
+    bot.telegram.sendMessage(
+      ctx.from.id,
+      "Barcha kinolar ushub kanalda: @KinolarDunyosi_Tv"
+    );
+  } catch (e) {
+    console.log(e);
+  }
+});
+bot.on("channel_post", async (ctx) => {
+  if (
+    ctx.chat.id == `-100${birKanalId}` ||
+    ctx.chat.id == `-100${ikkiKanalId}` ||
+    ctx.chat.id == "-1002169081242"
+  ) {
+    try {
+      bot.telegram.editMessageReplyMarkup(
+        ctx.chat.id,
+        ctx.channelPost.message_id,
+        "ctx.inlineMessageId,",
+        { inline_keyboard: kanalKeyboard }
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  }
+});
+bot.on("message", async (ctx) => {
+  console.log(ctx.chat.type);
   const azo = await isMemberFunc(ctx);
   if (!azo) {
     try {
